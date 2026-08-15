@@ -1,0 +1,6 @@
+interface:
+  display_name: "LaplaceLajiang Photo Card"
+  short_description: "照片风格展厅、高清卡片与跨平台提示词商品包"
+  default_prompt: "使用 $laplacelajiang-photo-card 把照片制作成 24 风格展览，或导出豆包、Kimi、千问可用的无 Codex 提示词商品包。"
+policy:
+  allow_implicit_invocation: true

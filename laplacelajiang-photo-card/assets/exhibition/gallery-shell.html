@@ -1,0 +1,247 @@
+<!doctype html>
+<html lang="zh-CN" data-gallery-version="4.0">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="color-scheme" content="dark">
+  <meta name="theme-color" content="#2b160f">
+  <title>廿四境 · 私人影像展</title>
+  <link rel="stylesheet" href="exhibition/gallery.css">
+  <script src="exhibition/vendor/gsap.min.js" defer></script>
+</head>
+<body>
+  <div class="desktop-gate" id="desktop-gate" hidden>
+    <div class="desktop-gate__card">
+      <p class="kicker">DESKTOP EXHIBITION</p>
+      <h1>请在桌面宽屏参观</h1>
+      <p>本展览为 1366 × 768 及以上桌面屏幕设计。请放大浏览器窗口后重新进入。</p>
+    </div>
+  </div>
+
+  <main class="museum" id="museum" aria-label="廿四境私人影像展">
+    <canvas id="gallery-canvas" aria-label="三维私人展厅"></canvas>
+    <div class="ambient-vignette" aria-hidden="true"></div>
+    <div class="light-curtain" id="light-curtain" aria-hidden="true"></div>
+
+    <header class="museum-bar">
+      <div class="museum-brand">
+        <span class="museum-brand__cn">廿四境</span>
+        <span class="museum-brand__en">PRIVATE IMAGE SALON · __BUILD_VERSION__</span>
+      </div>
+      <div class="museum-progress" aria-live="polite">
+        <span>VIEW</span>
+        <strong id="current-number">01</strong>
+        <i></i>
+        <span id="total-number">24</span>
+      </div>
+    </header>
+
+    <nav class="museum-actions" aria-label="展览功能">
+      <button class="text-button" id="open-catalog" type="button">
+        <span>展品名册</span><small>CATALOGUE</small>
+      </button>
+      <button class="text-button" id="open-mirror" type="button">
+        <span>镜语室</span><small>STYLE RECIPES</small>
+      </button>
+    </nav>
+
+    <section class="placard" id="placard" aria-live="polite">
+      <div class="placard__index"><span id="placard-number">01</span><i></i><span>24</span></div>
+      <h1 id="placard-title" data-fit-title>作品标题</h1>
+      <p id="placard-description">策展说明</p>
+      <footer>
+        <span id="placard-style">风格说明</span>
+        <button id="placard-collect" class="collect-button" type="button" aria-pressed="false">
+          <i aria-hidden="true"></i><span>收入收藏袋</span>
+        </button>
+      </footer>
+    </section>
+
+    <div class="art-hint" id="art-hint">
+      <span>点击作品细看</span><i></i><span>拖动画框感受悬挂</span>
+    </div>
+
+    <button class="side-step side-step--previous" id="previous-artwork" type="button" aria-label="上一幅作品">
+      <span aria-hidden="true">←</span><small>上一幅</small>
+    </button>
+    <button class="side-step side-step--next" id="next-artwork" type="button" aria-label="下一幅作品">
+      <small>下一幅</small><span aria-hidden="true">→</span>
+    </button>
+
+    <button class="collection-bag" id="open-collection" type="button">
+      <span class="collection-bag__mark" aria-hidden="true"></span>
+      <span><b>收藏袋</b><small id="collection-count">0 / 6</small></span>
+    </button>
+
+    <label class="quality-control" for="quality-select">
+      <span>画质 <b id="quality-state">自动</b></span>
+      <select id="quality-select" aria-label="展厅画质">
+        <option value="auto">自动</option>
+        <option value="low">流畅</option>
+        <option value="medium">均衡</option>
+        <option value="high">精细</option>
+      </select>
+    </label>
+
+    <section class="entrance" id="entrance">
+      <div class="entrance__copy">
+        <p class="kicker">PRIVATE VIEW · TWENTY-FOUR WORKS</p>
+        <h1>廿四境</h1>
+        <p class="entrance__subtitle">把同一段影像，带进二十四种观看方式。</p>
+        <button class="door-cta" id="enter-gallery" type="button">
+          <span class="door-cta__disc" aria-hidden="true"></span>
+          <span><b>触碰黄铜门把</b><small>进入私人预展</small></span>
+        </button>
+      </div>
+      <aside class="mother-plate">
+        <span>母片 · ORIGINAL</span>
+        <img src="exhibition/assets/mother-plate.webp" alt="本次展览的原始照片">
+        <p>所有展品均从这张母片出发；主体、结构与真实关系被持续保留。</p>
+      </aside>
+      <p class="entrance__note">建议佩戴耳机 · 点击后自动抵达最佳观看距离</p>
+    </section>
+
+    <section class="loading-room" id="loading-room">
+      <div class="loading-room__inner">
+        <p class="kicker">CURATORIAL FOYER</p>
+        <h1>正在点亮展厅</h1>
+        <p id="loading-copy">核对 24 幅展品与材质资源</p>
+        <div class="loading-track"><i id="loading-progress"></i></div>
+        <div class="loading-stats"><span id="loading-current">00</span><span>/</span><span id="loading-total">24</span></div>
+      </div>
+    </section>
+
+    <section class="unsupported" id="unsupported" hidden>
+      <div>
+        <p class="kicker">TECHNICAL FALLBACK</p>
+        <h1>三维展厅暂未点亮</h1>
+        <p id="unsupported-reason">浏览器未能启用 WebGL。</p>
+        <a href="style-gallery-accessible.html">打开展品清单模式</a>
+      </div>
+    </section>
+  </main>
+
+  <dialog class="focus-view" id="focus-view">
+    <div class="focus-backdrop" data-close-dialog="focus-view"></div>
+    <div class="focus-layout">
+      <button class="round-close" type="button" data-close-dialog="focus-view" aria-label="关闭细看">×</button>
+      <article class="focus-copy">
+        <p class="kicker"><span id="focus-number">01</span> · CURATORIAL NOTE</p>
+        <h2 id="focus-title" data-fit-title>作品标题</h2>
+        <p id="focus-description">作品简介</p>
+        <dl>
+          <div><dt>风格</dt><dd id="focus-style">风格说明</dd></div>
+          <div><dt>来源</dt><dd id="focus-source">LaplaceLajiang</dd></div>
+        </dl>
+        <button class="primary-button" id="focus-collect" type="button" aria-pressed="false">收入收藏袋</button>
+        <p class="compare-help">按住“查看母片”可比较原始画面，松开即返回展品。</p>
+      </article>
+      <div class="focus-art-stage" id="focus-art-stage">
+        <div class="focus-frame" id="focus-frame">
+          <img id="focus-image" alt="完整展品">
+          <img class="focus-source-image" id="focus-source-image" src="exhibition/assets/mother-plate.webp" alt="母片">
+        </div>
+        <div class="focus-tools">
+          <button id="compare-source" type="button">按住查看母片</button>
+          <button id="toggle-lens" type="button" aria-pressed="false">细节镜</button>
+          <span>滚轮缩放 · 拖动查看细节</span>
+        </div>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="catalogue" id="catalogue">
+    <div class="dialog-shade" data-close-dialog="catalogue"></div>
+    <div class="catalogue-stage">
+      <button class="round-close" type="button" data-close-dialog="catalogue" aria-label="合上名册">×</button>
+      <div class="walnut-stand" aria-hidden="true"></div>
+      <div class="catalogue-book" id="catalogue-book">
+        <section class="catalogue-cover" id="catalogue-cover">
+          <div class="catalogue-cover__rule"></div>
+          <p>PRIVATE COLLECTION</p>
+          <h2>廿四境<br>展品名册</h2>
+          <span>NO. __BUILD_VERSION__</span>
+          <button id="open-book" type="button">翻开名册</button>
+        </section>
+        <section class="catalogue-spread" id="catalogue-spread" aria-live="polite">
+          <div class="catalogue-page catalogue-page--left">
+            <header><span id="catalogue-chapter">第一章</span><small>PRIVATE IMAGE SALON</small></header>
+            <div class="catalogue-grid" id="catalogue-left"></div>
+            <footer><span id="catalogue-left-page">01</span></footer>
+          </div>
+          <div class="catalogue-gutter" aria-hidden="true"></div>
+          <div class="catalogue-page catalogue-page--right">
+            <header><small>TWENTY-FOUR WORKS</small><span id="catalogue-range">01—04</span></header>
+            <div class="catalogue-grid" id="catalogue-right"></div>
+            <footer><span id="catalogue-right-page">02</span></footer>
+          </div>
+          <div class="page-turn" id="page-turn" aria-hidden="true"><div></div></div>
+        </section>
+      </div>
+      <div class="catalogue-controls">
+        <button id="catalogue-previous" type="button">← 上一页</button>
+        <span><b id="catalogue-current-spread">1</b> / <span id="catalogue-total-spreads">6</span></span>
+        <button id="catalogue-next" type="button">下一页 →</button>
+      </div>
+    </div>
+  </dialog>
+
+  <dialog class="mirror-room" id="mirror-room">
+    <div class="dialog-shade" data-close-dialog="mirror-room"></div>
+    <div class="mirror-layout">
+      <button class="round-close" type="button" data-close-dialog="mirror-room" aria-label="离开镜语室">×</button>
+      <aside class="mirror-index">
+        <p class="kicker">镜语廿四式</p>
+        <h2>风格配方索引</h2>
+        <div id="mirror-index-list"></div>
+      </aside>
+      <article class="mirror-recipe">
+        <p class="kicker"><span id="mirror-number">01</span> · STYLE RECIPE</p>
+        <h2 id="mirror-title" data-fit-title>作品标题</h2>
+        <p id="mirror-summary">风格摘要</p>
+        <div class="recipe-tabs" role="tablist">
+          <button id="recipe-basic-tab" type="button" role="tab" aria-selected="true">基础配方</button>
+          <button id="recipe-advanced-tab" type="button" role="tab" aria-selected="false">进阶控制</button>
+        </div>
+        <div class="recipe-panel" id="recipe-basic" role="tabpanel"></div>
+        <div class="recipe-panel" id="recipe-advanced" role="tabpanel" hidden></div>
+        <button class="secondary-button" id="copy-recipe" type="button">复制当前配方</button>
+      </article>
+    </div>
+  </dialog>
+
+  <dialog class="collection-room" id="collection-room">
+    <div class="dialog-shade" data-close-dialog="collection-room"></div>
+    <div class="collection-layout">
+      <button class="round-close" type="button" data-close-dialog="collection-room" aria-label="关闭收藏袋">×</button>
+      <header>
+        <p class="kicker">LINEN PORTFOLIO · TAKE HOME</p>
+        <h2>你的收藏袋</h2>
+        <p>首次可带走 1–6 幅；高清制作完成后，仍可从展览档案中继续增选。</p>
+      </header>
+      <div class="collection-list" id="collection-list"></div>
+      <aside class="packing-desk">
+        <div class="packing-desk__top">
+          <span>装裱与包装进度</span><strong id="packing-percent">0%</strong>
+        </div>
+        <div class="packing-track"><i id="packing-progress"></i></div>
+        <p id="packing-status">尚未提交高清制作</p>
+        <code id="packing-path">确认收藏后显示取件路径</code>
+        <button class="primary-button" id="confirm-collection" type="button">确认收藏并开始精装</button>
+      </aside>
+    </div>
+  </dialog>
+
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
+  <script id="gallery-data" type="application/json">__GALLERY_DATA__</script>
+  <script>
+    if (location.protocol === 'file:') {
+      document.getElementById('loading-room').hidden = true;
+      const unsupported = document.getElementById('unsupported');
+      unsupported.hidden = false;
+      document.getElementById('unsupported-reason').textContent = '请运行随展览生成的“打开廿四境展厅.cmd”，本地服务会自动打开完整三维展厅。';
+    }
+  </script>
+  <script type="module" src="exhibition/gallery-runtime.js"></script>
+</body>
+</html>
