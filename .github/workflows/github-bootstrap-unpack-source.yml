@@ -34,7 +34,7 @@ jobs:
                   if not normalized:
                       continue
                   target = Path(*normalized.split("/"))
-                  if member.is_dir():
+                  if member.is_dir() or member.filename.endswith(("/", "\\")):
                       target.mkdir(parents=True, exist_ok=True)
                       continue
                   target.parent.mkdir(parents=True, exist_ok=True)
