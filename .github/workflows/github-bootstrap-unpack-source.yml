@@ -1,0 +1,53 @@
+name: Materialize packaged source
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - "LaplaceLajiang-photo-card-v4.0.0.zip"
+      - ".github/workflows/unpack-source.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  unpack:
+    if: github.actor != 'github-actions[bot]'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Verify packaged source
+        run: sha256sum -c LaplaceLajiang-photo-card-v4.0.0.zip.sha256
+
+      - name: Extract source tree
+        shell: python
+        run: |
+          from pathlib import Path
+          from zipfile import ZipFile
+
+          archive = Path("LaplaceLajiang-photo-card-v4.0.0.zip")
+          with ZipFile(archive) as bundle:
+              for member in bundle.infolist():
+                  normalized = member.filename.replace("\\", "/").strip("/")
+                  if not normalized:
+                      continue
+                  target = Path(*normalized.split("/"))
+                  if member.is_dir():
+                      target.mkdir(parents=True, exist_ok=True)
+                      continue
+                  target.parent.mkdir(parents=True, exist_ok=True)
+                  target.write_bytes(bundle.read(member))
+
+      - name: Commit source tree
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add laplacelajiang-photo-card
+          if git diff --cached --quiet; then
+            echo "Source tree is already current."
+            exit 0
+          fi
+          git commit -m "release: unpack v4.0.0 source"
+          git push
